@@ -1,4 +1,14 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import {
+  type LoaderFunction,
+  json,
+  type MetaFunction,
+} from "@remix-run/cloudflare";
+import { useLoaderData } from "@remix-run/react";
+import type { Todo } from "~/types/todo";
+
+type LoaderData = {
+  data: Todo[];
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,25 +20,27 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader: LoaderFunction = async () => {
+  const response = await fetch("http://localhost:8787/todos");
+
+  if (response.ok) {
+    const data: Todo[] = await response.json();
+    return json({ data });
+  }
+  return json({ response: null });
+};
+
 export default function Index() {
+  const { data } = useLoaderData<LoaderData>();
+
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix (with Vite and Cloudflare)</h1>
       <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://developers.cloudflare.com/pages/framework-guides/deploy-a-remix-site/"
-            rel="noreferrer"
-          >
-            Cloudflare Pages Docs - Remix guide
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
+        {data?.map((todo: Todo) => (
+          <li key={todo.id}>
+            {todo.title} - {todo.completed ? "Completed" : "Not completed"}
+          </li>
+        ))}
       </ul>
     </div>
   );
