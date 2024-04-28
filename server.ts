@@ -1,12 +1,18 @@
 import { Hono } from "hono";
-import { basicAuth } from "hono/basic-auth";
+// import { basicAuth } from "hono/basic-auth";
 import { secureHeaders } from "hono/secure-headers";
 import { createRequestHandler } from "@remix-run/cloudflare";
 import * as build from "./build/server";
+import { drizzle } from "drizzle-orm/d1";
+import { todos } from "drizzle/schema";
+import { eq } from "drizzle-orm";
 
 const remixHandler = createRequestHandler(build, process.env.NODE_ENV);
+type Bindings = {
+  DB: D1Database;
+};
 
-const app = new Hono();
+const app = new Hono<{ Bindings: Bindings }>();
 
 // app.use(
 //   "*",
@@ -16,27 +22,60 @@ const app = new Hono();
 //   })
 // );
 
-app.get("/todos", (c) => {
-  const todos = [
-    { id: 1, title: "Buy groceries", completed: false },
-    { id: 2, title: "Walk the dog", completed: true },
-    { id: 3, title: "Do laundry", completed: false },
-  ];
-  return c.json(todos);
+/**
+ * todos
+ */
+app.get("/todos", async (c) => {
+  const db = drizzle(c.env.DB);
+  const result = await db.select().from(todos).all();
+  return c.json(result);
 });
 
-app.post("/todos", (c) => {
-  const newTodo = { id: 4, title: "Clean the house", completed: false };
-  return c.json(newTodo);
+/**
+ * create todo
+ */
+app.post("/todos", async (c) => {
+  const params = await c.req.json<typeof todos.$inferSelect>();
+  const db = drizzle(c.env.DB);
+  const result = await db
+    .insert(todos)
+    .values({ title: params.title })
+    .execute();
+  return c.json(result);
 });
 
-app.put("/todos/:id", (c) => {
-  const updatedTodo = { id: 4, title: "Clean the house", completed: true };
-  return c.json(updatedTodo);
+/**
+ * update todo
+ */
+app.put("/todos/:id", async (c) => {
+  const id = Number.parseInt(c.req.param("id"));
+
+  if (Number.isNaN(id)) {
+    return c.json({ error: "invalid ID" }, 400);
+  }
+
+  const params = await c.req.json<typeof todos.$inferSelect>();
+  const db = drizzle(c.env.DB);
+  const result = await db
+    .update(todos)
+    .set({ title: params.title, isCompleted: params.isCompleted })
+    .where(eq(todos.id, id));
+  return c.json(result);
 });
 
-app.delete("/todos/:id", (c) => {
-  return c.json({ message: "Todo deleted successfully" });
+/**
+ * delete todo
+ */
+app.delete("/todos/:id", async (c) => {
+  const id = Number.parseInt(c.req.param("id"));
+
+  if (Number.isNaN(id)) {
+    return c.json({ error: "invalid ID" }, 400);
+  }
+
+  const db = drizzle(c.env.DB);
+  const result = await db.delete(todos).where(eq(todos.id, id));
+  return c.json(result);
 });
 
 app.use("*", secureHeaders());
