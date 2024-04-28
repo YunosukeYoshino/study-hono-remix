@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1714293267589,
+      "tag": "0000_aberrant_gunslinger",
+      "breakpoints": true
+    }
+  ]
+}
