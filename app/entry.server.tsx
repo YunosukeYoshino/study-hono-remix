@@ -8,7 +8,7 @@ import type { AppLoadContext, EntryContext } from "@remix-run/cloudflare";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
-
+import "dotenv/config";
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
