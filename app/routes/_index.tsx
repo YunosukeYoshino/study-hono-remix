@@ -2,8 +2,10 @@ import {
   type LoaderFunction,
   json,
   type MetaFunction,
+  ActionFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
+import { postData } from "~/action";
 import TodoForm from "~/components/TodoForm";
 import type { Todo } from "~/types/todo";
 
@@ -30,6 +32,20 @@ export const loader: LoaderFunction = async () => {
     return json({ data });
   }
   return json({ response: null });
+};
+
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+
+  const title = formData.get("todo-title");
+  if (typeof title !== "string" || title.length === 0) {
+    return json(
+      { errors: { title: "TODOを入力してください" } },
+      { status: 422 }
+    );
+  }
+
+  return await postData(title);
 };
 
 export default function Index() {

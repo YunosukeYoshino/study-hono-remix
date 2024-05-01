@@ -8,9 +8,14 @@ type TodoFormProps = {
 const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
   return (
     <>
-      <Form method="POST">
-        <input type="text" className="border p-2" />
-        <button type="button" className="p-2 bg-slate-200">
+      <Form method="post">
+        <input
+          type="text"
+          className="border p-2"
+          name="todo-title"
+          placeholder="New task"
+        />
+        <button type="submit" className="p-2 bg-slate-200">
           Add
         </button>
       </Form>
