@@ -1,3 +1,6 @@
+/*  deploy: bunx wrangler deploy server.ts */
+/* dev: bunx wrangler dev server.ts */
+
 import { Hono } from "hono";
 // import { basicAuth } from "hono/basic-auth";
 import { secureHeaders } from "hono/secure-headers";
