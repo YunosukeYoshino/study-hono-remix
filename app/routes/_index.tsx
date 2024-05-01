@@ -5,7 +5,7 @@ import {
   ActionFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { postData } from "~/action";
+import { deleteData, postData } from "~/action";
 import TodoForm from "~/components/TodoForm";
 import type { Todo } from "~/types/todo";
 
@@ -36,16 +36,35 @@ export const loader: LoaderFunction = async () => {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+  const method = request.method;
 
-  const title = formData.get("todo-title");
-  if (typeof title !== "string" || title.length === 0) {
-    return json(
-      { errors: { title: "TODOを入力してください" } },
-      { status: 422 }
-    );
+  switch (method) {
+    case "POST": {
+      const title = formData.get("todo-title");
+      if (typeof title !== "string" || title.trim().length === 0) {
+        return json(
+          { errors: { title: "TODOを入力してください" } },
+          { status: 422 }
+        );
+      }
+      return await postData(title);
+    }
+
+    case "DELETE": {
+      const id = formData.get("todo-id");
+
+      if (typeof id !== "string") {
+        return json({ errors: { id: "IDが不正です" } }, { status: 400 });
+      }
+      return await deleteData(id);
+    }
+
+    default:
+      return json(
+        { errors: { method: "サポートされていないメソッドです" } },
+        { status: 405 }
+      );
   }
-
-  return await postData(title);
 };
 
 export default function Index() {
