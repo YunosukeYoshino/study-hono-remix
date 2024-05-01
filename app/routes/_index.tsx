@@ -4,6 +4,7 @@ import {
   type MetaFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
+import TodoForm from "~/components/TodoForm";
 import type { Todo } from "~/types/todo";
 
 type LoaderData = {
@@ -21,8 +22,9 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader: LoaderFunction = async () => {
-  const response = await fetch("http://localhost:8787/todos");
+  const baseUrl = import.meta.env.VITE_API_URL;
 
+  const response = await fetch(baseUrl);
   if (response.ok) {
     const data: Todo[] = await response.json();
     return json({ data });
@@ -33,15 +35,11 @@ export const loader: LoaderFunction = async () => {
 export default function Index() {
   const { data } = useLoaderData<LoaderData>();
 
+  if (!data) return <div>データがありません。</div>;
+
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <ul>
-        {data?.map((todo: Todo) => (
-          <li key={todo.id}>
-            {todo.title} - {todo.completed ? "Completed" : "Not completed"}
-          </li>
-        ))}
-      </ul>
+      <TodoForm data={data} />
     </div>
   );
 }
