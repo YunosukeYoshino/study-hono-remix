@@ -2,7 +2,7 @@ import {
   type LoaderFunction,
   json,
   type MetaFunction,
-  ActionFunction,
+  type ActionFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { deleteData, postData } from "~/action";

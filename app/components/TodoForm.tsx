@@ -1,5 +1,5 @@
 import { Form } from "@remix-run/react";
-import { Todo } from "~/types/todo";
+import type { Todo } from "~/types/todo";
 
 type TodoFormProps = {
   data: Todo[];
@@ -15,7 +15,7 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
           name="todo-title"
           placeholder="New task"
         />
-        <button type="submit" className="p-2 bg-slate-200">
+        <button type="submit" className="bg-slate-200 p-2">
           Add
         </button>
       </Form>
