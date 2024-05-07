@@ -1,4 +1,4 @@
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 import type { Todo } from "~/types/todo";
 
 type TodoFormProps = {
@@ -22,8 +22,8 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 			<ul className="mt-10">
 				{data?.map((todo: Todo) => (
 					<li key={todo.id} className="flex gap-2">
-						{todo.title}
 						<input type="checkbox" checked={todo.completed} />
+						<Link to={`update/${todo.id}`}>{todo.title}</Link>
 						<Form method="delete">
 							<input type="hidden" name="todo-id" value={todo.id} />
 							<button type="submit">消す</button>
