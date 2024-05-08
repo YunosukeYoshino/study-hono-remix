@@ -37,3 +37,22 @@ export async function deleteData(id: string) {
 
 	return { message: "Data deleted successfully." }; // 削除成功のメッセージを返す
 }
+
+export async function putData(id: string, title: string) {
+	const baseUrl = import.meta.env.VITE_API_URL;
+	if (!baseUrl) {
+		throw new Error("API_URL environment variable is not defined.");
+	}
+	const response = await fetch(`${baseUrl}/${id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ title }),
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to PUT data: ${response.status}`);
+	}
+	const responseData = await response.json();
+	return responseData;
+}

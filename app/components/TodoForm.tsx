@@ -23,7 +23,7 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 				{data?.map((todo: Todo) => (
 					<li key={todo.id} className="flex gap-2">
 						<input type="checkbox" checked={todo.completed} />
-						<Link to={`update/${todo.id}`}>{todo.title}</Link>
+						<Link to={`post/${todo.id}`}>{todo.title}</Link>
 						<Form method="delete">
 							<input type="hidden" name="todo-id" value={todo.id} />
 							<button type="submit">消す</button>

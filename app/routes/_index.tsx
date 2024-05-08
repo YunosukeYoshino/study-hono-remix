@@ -5,7 +5,7 @@ import {
 	json,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { deleteData, postData } from "~/action";
+import { deleteData, postData, putData } from "~/action";
 import TodoForm from "~/components/TodoForm";
 import type { Todo } from "~/types/todo";
 
@@ -23,6 +23,7 @@ export const meta: MetaFunction = () => {
 	];
 };
 
+/** サーバ上でデータ取得の処理 */
 export const loader: LoaderFunction = async () => {
 	const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -34,6 +35,7 @@ export const loader: LoaderFunction = async () => {
 	return json({ response: null });
 };
 
+/** action:POSTリクエストで送信されてくるrequestオブジェクトを取得 */
 export const action: ActionFunction = async ({ request }) => {
 	const formData = await request.formData();
 	const method = request.method;
@@ -48,6 +50,21 @@ export const action: ActionFunction = async ({ request }) => {
 				);
 			}
 			return await postData(title);
+		}
+
+		case "PUT": {
+			const id = formData.get("todo-id");
+			const title = formData.get("todo-title");
+			if (typeof id !== "string") {
+				return json({ errors: { id: "IDが不正です" } }, { status: 400 });
+			}
+			if (typeof title !== "string" || title.trim().length === 0) {
+				return json(
+					{ errors: { title: "TODOを入力してください" } },
+					{ status: 422 },
+				);
+			}
+			return await putData(id, title);
 		}
 
 		case "DELETE": {
