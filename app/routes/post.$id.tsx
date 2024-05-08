@@ -1,4 +1,8 @@
-import type { ActionFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type {
+	ActionFunction,
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+} from "@remix-run/cloudflare";
 import { json } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import React from "react";
@@ -55,12 +59,14 @@ export default function PostDetailPage() {
 	const [isEditing, setIsEditing] = React.useState(false);
 	const [newTitle, setNewTitle] = React.useState(post.title);
 
-	const handleAction = async (e) => {
-		// サーバーアクションを実行
-		// setIsEditingをfalseに設定
+	const handleAction = async (
+		e: ActionFunctionArgs | React.FormEvent<HTMLFormElement>,
+	) => {
 		setIsEditing(false);
 
-		await action(e);
+		if ("request" in e && "params" in e) {
+			await action(e);
+		}
 	};
 	if (!post)
 		return (
