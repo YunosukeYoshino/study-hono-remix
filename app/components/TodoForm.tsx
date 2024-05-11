@@ -1,5 +1,5 @@
 import { Form, Link, useFetcher } from "@remix-run/react";
-import { completedPutData, putData } from "~/action";
+import React from "react";
 import type { Todo } from "~/types/todo";
 
 type TodoFormProps = {
@@ -7,6 +7,8 @@ type TodoFormProps = {
 };
 
 const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
+	const [newTitle, setNewTitle] = React.useState("");
+
 	const fetcher = useFetcher();
 	const submitCompletedPut = ({
 		id,
@@ -15,6 +17,18 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 		const formData = new FormData();
 		formData.append("todo-id", String(id));
 		formData.append("isCompleted", String(isCompleted));
+		fetcher.submit(formData, {
+			method: "PUT",
+		});
+	};
+
+	const submitTitlePut = ({ id, title }: Pick<Todo, "id" | "title">) => {
+		const formData = new FormData();
+
+		if (!title) return;
+		formData.append("todo-id", String(id));
+		formData.append("todo-title", String(title));
+
 		fetcher.submit(formData, {
 			method: "PUT",
 		});
@@ -34,28 +48,44 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 			</Form>
 
 			<div className="mt-10">
-				<h2 className="font-bold">未完了</h2>
 				<ul>
 					{data?.map((todo: Todo) => {
 						return (
 							<li key={todo.id} className="flex gap-2">
-								<Form method="put">
-									<input type="hidden" value={todo.id} name="todo-id" />
-									<input
-										type="checkbox"
-										defaultChecked={todo.isCompleted}
-										onChange={() =>
-											submitCompletedPut({
-												id: todo.id,
-												isCompleted: !todo.isCompleted,
-											})
-										}
-									/>
-								</Form>
+								<input type="hidden" value={todo.id} name="todo-id" />
+								<input
+									type="checkbox"
+									defaultChecked={todo.isCompleted}
+									onChange={() =>
+										submitCompletedPut({
+											id: todo.id,
+											isCompleted: todo.isCompleted,
+										})
+									}
+								/>
 								<Link to={`post/${todo.id}`}>{todo.title}</Link>
 								<Form method="delete">
 									<input type="hidden" name="todo-id" value={todo.id} />
 									<button type="submit">消す</button>
+								</Form>
+								<Form
+									method="put"
+									onSubmit={() =>
+										submitTitlePut({ id: todo.id, title: newTitle })
+									}
+								>
+									<input
+										className="border border-slate-400"
+										type="text"
+										value={newTitle}
+										name="todo-title"
+										onChange={(e) => {
+											setNewTitle(todo.title);
+											const newTitle = e.target.value;
+											setNewTitle(newTitle);
+										}}
+									/>
+									<button type="submit">編集する</button>
 								</Form>
 							</li>
 						);

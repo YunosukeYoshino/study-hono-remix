@@ -6,7 +6,7 @@ import type {
 import { json } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import React from "react";
-import { deleteData, postData, putData } from "~/action";
+import { putData } from "~/action";
 import type { Todo } from "~/types/todo";
 
 //  このページは、特定のIDのTodoを表示するページです。
@@ -16,8 +16,6 @@ import type { Todo } from "~/types/todo";
 // 4. 編集ボタンをクリックすると、タイトルが編集可能になります。
 // 5. 編集可能な状態で、タイトルを変更し、Enterキーを押すと、そのタイトルに変更されます。
 // 6. 編集可能な状態で、フォーカスを外すと、変更が破棄されます。
-
-// TODO:setNewTitleで更新された値をAPIに送信する(PUT)
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
 	const baseUrl = import.meta.env.VITE_API_URL;

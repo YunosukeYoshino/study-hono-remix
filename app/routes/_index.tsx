@@ -55,9 +55,7 @@ export const action: ActionFunction = async ({ request }) => {
 		case "PUT": {
 			const id = formData.get("todo-id");
 			const title = formData.get("todo-title");
-
-			const isCompleted = formData.get("todo-completed") === "on";
-			console.log(`${isCompleted}`, "TEST");
+			const isCompletedBoolean = formData.get("isCompleted") === "true";
 
 			if (id && title) {
 				if (typeof id !== "string") {
@@ -72,12 +70,11 @@ export const action: ActionFunction = async ({ request }) => {
 				return await putData(id, title);
 			}
 
-			if (isCompleted !== null && id) {
+			if (isCompletedBoolean !== null && id) {
 				if (typeof id !== "string") {
 					return json({ errors: { id: "IDが不正です" } }, { status: 400 });
 				}
-
-				return await completedPutData(id, isCompleted);
+				return await completedPutData(id, isCompletedBoolean);
 			}
 
 			return json(
