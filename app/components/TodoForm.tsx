@@ -48,7 +48,7 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 			</Form>
 
 			<div className="mt-10">
-				<ul>
+				<ul className="space-y-2">
 					{data?.map((todo: Todo) => {
 						return (
 							<li key={todo.id} className="flex gap-2">
@@ -63,30 +63,31 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 										})
 									}
 								/>
-								<Link to={`post/${todo.id}`}>{todo.title}</Link>
-								<Form method="delete">
-									<input type="hidden" name="todo-id" value={todo.id} />
-									<button type="submit">消す</button>
-								</Form>
+
 								<Form
-									method="put"
 									onSubmit={() =>
 										submitTitlePut({ id: todo.id, title: newTitle })
 									}
+									className="flex gap-2"
 								>
 									<input
-										className="border border-slate-400"
+										className="w-[300px] focus:outline-blue-500"
 										type="text"
-										value={newTitle}
+										defaultValue={todo.title}
 										name="todo-title"
 										onChange={(e) => {
-											setNewTitle(todo.title);
 											const newTitle = e.target.value;
 											setNewTitle(newTitle);
 										}}
 									/>
 									<button type="submit">編集する</button>
 								</Form>
+
+								<Form method="delete">
+									<input type="hidden" name="todo-id" value={todo.id} />
+									<button type="submit">消す</button>
+								</Form>
+								<Link to={`post/${todo.id}`}>詳細ページ</Link>
 							</li>
 						);
 					})}
