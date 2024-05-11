@@ -1,4 +1,4 @@
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useFetcher } from "@remix-run/react";
 import { completedPutData, putData } from "~/action";
 import type { Todo } from "~/types/todo";
 
@@ -7,6 +7,18 @@ type TodoFormProps = {
 };
 
 const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
+	const fetcher = useFetcher();
+	const submitCompletedPut = ({
+		id,
+		isCompleted,
+	}: Pick<Todo, "id" | "isCompleted">) => {
+		const formData = new FormData();
+		formData.append("todo-id", String(id));
+		formData.append("isCompleted", String(isCompleted));
+		fetcher.submit(formData, {
+			method: "PUT",
+		});
+	};
 	return (
 		<>
 			<Form method="post">
@@ -25,58 +37,28 @@ const TodoForm: React.FC<TodoFormProps> = ({ data }: TodoFormProps) => {
 				<h2 className="font-bold">未完了</h2>
 				<ul>
 					{data?.map((todo: Todo) => {
-						if (!todo.isCompleted) {
-							return (
-								<li key={todo.id} className="flex gap-2">
-									<Link to={`post/${todo.id}`}>{todo.title}</Link>
-									<Form method="delete">
-										<input type="hidden" name="todo-id" value={todo.id} />
-										<button type="submit">消す</button>
-									</Form>
-									<Form method="put">
-										<input type="hidden" value={todo.id} name="todo-id" />
-										<input
-											type="checkbox"
-											name="todo-completed"
-											checked={todo.isCompleted}
-										/>
-										<button type="submit">
-											{todo.isCompleted ? "未完了にする" : "完了にする"}
-										</button>
-									</Form>
-								</li>
-							);
-						}
-					})}
-				</ul>
-			</div>
-
-			<div className="mt-10">
-				<h2 className="font-bold">完了</h2>
-				<ul>
-					{data?.map((todo: Todo) => {
-						if (todo.isCompleted) {
-							return (
-								<li key={todo.id} className="flex gap-2">
-									<Link to={`post/${todo.id}`}>{todo.title}</Link>
-									<Form method="delete">
-										<input type="hidden" name="todo-id" value={todo.id} />
-										<button type="submit">消す</button>
-									</Form>
-									<Form method="put">
-										<input type="hidden" value={todo.id} name="todo-id" />
-										<input
-											type="checkbox"
-											name="todo-completed"
-											checked={todo.isCompleted}
-										/>
-										<button type="submit">
-											{todo.isCompleted ? "未完了にする" : "完了にする"}
-										</button>
-									</Form>
-								</li>
-							);
-						}
+						return (
+							<li key={todo.id} className="flex gap-2">
+								<Form method="put">
+									<input type="hidden" value={todo.id} name="todo-id" />
+									<input
+										type="checkbox"
+										defaultChecked={todo.isCompleted}
+										onChange={() =>
+											submitCompletedPut({
+												id: todo.id,
+												isCompleted: !todo.isCompleted,
+											})
+										}
+									/>
+								</Form>
+								<Link to={`post/${todo.id}`}>{todo.title}</Link>
+								<Form method="delete">
+									<input type="hidden" name="todo-id" value={todo.id} />
+									<button type="submit">消す</button>
+								</Form>
+							</li>
+						);
 					})}
 				</ul>
 			</div>
