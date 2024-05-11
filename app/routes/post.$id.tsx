@@ -74,8 +74,6 @@ export default function PostDetailPage() {
 		);
 	return (
 		<Form method="put" className="flex gap-4" onSubmit={(e) => handleAction(e)}>
-			<input checked={post.isCompleted} type="checkbox" />
-
 			{!isEditing ? (
 				<>
 					<h1>{post.title}</h1>
