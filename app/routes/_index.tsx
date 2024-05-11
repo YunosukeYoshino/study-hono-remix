@@ -5,7 +5,7 @@ import {
 	json,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { deleteData, postData, putData } from "~/action";
+import { completedPutData, deleteData, postData, putData } from "~/action";
 import TodoForm from "~/components/TodoForm";
 import type { Todo } from "~/types/todo";
 
@@ -55,16 +55,35 @@ export const action: ActionFunction = async ({ request }) => {
 		case "PUT": {
 			const id = formData.get("todo-id");
 			const title = formData.get("todo-title");
-			if (typeof id !== "string") {
-				return json({ errors: { id: "IDが不正です" } }, { status: 400 });
+
+			const isCompleted = formData.get("todo-completed") === "on";
+			console.log(`${isCompleted}`, "TEST");
+
+			if (id && title) {
+				if (typeof id !== "string") {
+					return json({ errors: { id: "IDが不正です" } }, { status: 400 });
+				}
+				if (typeof title !== "string" || title.trim().length === 0) {
+					return json(
+						{ errors: { title: "TODOを入力してください" } },
+						{ status: 422 },
+					);
+				}
+				return await putData(id, title);
 			}
-			if (typeof title !== "string" || title.trim().length === 0) {
-				return json(
-					{ errors: { title: "TODOを入力してください" } },
-					{ status: 422 },
-				);
+
+			if (isCompleted !== null && id) {
+				if (typeof id !== "string") {
+					return json({ errors: { id: "IDが不正です" } }, { status: 400 });
+				}
+
+				return await completedPutData(id, isCompleted);
 			}
-			return await putData(id, title);
+
+			return json(
+				{ errors: { id: "IDまたはタイトルが不正です" } },
+				{ status: 400 },
+			);
 		}
 
 		case "DELETE": {

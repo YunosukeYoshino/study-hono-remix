@@ -56,3 +56,22 @@ export async function putData(id: string, title: string) {
 	const responseData = await response.json();
 	return responseData;
 }
+export async function completedPutData(id: string, isCompleted: boolean) {
+	const baseUrl = import.meta.env.VITE_API_URL;
+	if (!baseUrl) {
+		throw new Error("API_URL environment variable is not defined.");
+	}
+
+	const response = await fetch(`${baseUrl}/${id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ isCompleted: !isCompleted }),
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to PUT data: ${response.status}`);
+	}
+	const responseData = await response.json();
+	return responseData;
+}
